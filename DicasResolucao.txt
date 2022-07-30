@@ -1,0 +1,9 @@
+--- 30/07/2022
+1 - clonei o arquivo do github da Rocket
+  - 1.1 - não criar no diretório, deixar o comando "git clone" faça isso.
+2 - com o projeto aberto rodei " yarn " para instalar os pacotes
+3 - rodei o comando " yarn android " para executar o projeto
+4 - em uma outra janela do VSCode rode o comando " yarn test " para acompanhar os testes passando
+  conforme as alterações no projeto.
+5 - obs.: o state em react ou react-native, é assíncrono, então se der um console.log() no state, ele mostrara o state
+  muito provavel com o valor antigo, antes da renderização
