@@ -1,14 +1,24 @@
 import React, { useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { Alert, StyleSheet, View } from 'react-native';
 
 import { Header } from '../components/Header';
 import { Task, TasksList } from '../components/TasksList';
 import { TodoInput } from '../components/TodoInput';
 
+export type EditTaskArgs = {
+  taskId: number;
+  taskNewTitle: string
+}
+
 export function Home() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
   function handleAddTask(newTaskTitle: string) {
+    const taskWithSameTitke = tasks.find(task => task.title.toUpperCase() === newTaskTitle.toUpperCase());
+    if(taskWithSameTitke){
+      return Alert.alert('Task já cadastrada', 'Você não pode cadastrar uma task com o nome: ' + newTaskTitle);
+    }
+    
     //TODO - add new task
     const data = {
       id: new Date().getTime(),
@@ -21,16 +31,9 @@ export function Home() {
 
   function handleToggleTaskDone(id: number) {
     //TODO - toggle task done if exists
-    // 1 - procura o id passado no array de tasks
-    // 2 - se encontrar atualiza o debounce
-    // 3 - atualiza o array de tasks com o novo valor desse id alterado
-    /* obs:
-      1 - Shalow Cpy - copia a referência de memoria do objeto, ou seja, se altera no array copiado então altera 
-        tbm no original, isso quebra o principio de imutabilidade 
-     */
     // criando um novo array, copiando o conteudo real e não a referencia, serve para casos que o tipo de dados
     //  desse array são primitivos
-    const updTasks = tasks.map(task => ({ ...task }))
+    const updTasks = tasks.map(task => ({ ...task }));
     const foundItem = updTasks.find(item => item.id === id);
     
     if(!foundItem) return;
@@ -39,10 +42,32 @@ export function Home() {
     setTasks(updTasks);
   }
 
-  function handleRemoveTask(id: number) {
-    //TODO - remove task from state
-    const updTasks = tasks.filter(task => task.id !== id);
+  function handleEditTask({ taskId, taskNewTitle }: EditTaskArgs){
+    const updTasks = tasks.map(task => ({ ...task }));
+    const taskItem = updTasks.find(item => item.id === taskId);
+
+    if(!taskItem) return;
+
+    taskItem.title = taskNewTitle; // troca o nome to title
     setTasks(updTasks);
+  }
+
+  function handleRemoveTask(id: number) {
+    Alert.alert('Remover item','Tem certeza que você deseja remover esse item?',[
+      {
+        style: 'cancel',
+        text: 'Não'
+      },
+      {
+        style: 'destructive',
+        text: 'Sim',
+        onPress: () => {
+          //TODO - remove task from state
+          const updTasks = tasks.filter(task => task.id !== id);
+          setTasks(updTasks);
+        }
+      }
+    ])
   }
 
   return (
@@ -54,7 +79,8 @@ export function Home() {
       <TasksList 
         tasks={tasks} 
         toggleTaskDone={handleToggleTaskDone}
-        removeTask={handleRemoveTask} 
+        removeTask={handleRemoveTask}
+        editTask={handleEditTask}
       />
     </View>
   )
